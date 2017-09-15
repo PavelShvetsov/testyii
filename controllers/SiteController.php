@@ -14,6 +14,7 @@ use app\models\User;
 use app\models\UserAttributes;
 use app\models\UserAttributeValues;
 use yii\base\Model;
+use yii\base\DynamicModel;
 
 class SiteController extends Controller
 {
@@ -95,16 +96,41 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionSignup(){
+    public function getModelFormAttributes($attrs){
+        $attrModel=[];
+        foreach ($attrs as $attr){
+            $attrModel[]=$attr['name'];
+        }
+        //Динамическая модель
+        $modelAttr = new DynamicModel($attrModel);
+
+        //echo '<pre>';print_r($attrs);echo '</pre>';
+
+        //Валидация доп.полей
+        foreach($attrs as $attr) {
+            //$modelAttr->addRule([$attr['name']], $attr['attributeValidate'][0]->value, ['min' => 3]);
+            /*if($attr['attributeValidate'][0]->required){
+                $modelAttr->addRule([$attr['name']], 'required');
+            }*/
+        }
+        return $modelAttr;
+    }
+
+
+    public function actionSignup()
+    {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new SignupForm();
+        $attrs=UserAttributes::find()->with('attributeValidate','attributeValidate2')->indexBy('id')->all();
 
-        $attributes=UserAttributes::getAttrs();
-        $modelAttr=UserAttributes::getModelFormAttributes($attributes);
+        echo '<pre>';print_r($attrs);echo '</pre>';
 
+        $modelAttr=$this->getModelFormAttributes($attrs);
+
+        //
         if($model->load(Yii::$app->request->post()) && $modelAttr->load(Yii::$app->request->post())){
             $isValid = $model->validate();
             $isValid = $modelAttr->validate() && $isValid;
@@ -116,24 +142,26 @@ class SiteController extends Controller
                 $user->group = 2;
 
                 if($user->save()) {
-                    foreach ($attributes as $id_attr => $attr_val) {
+                    foreach ($attrs as $id_attr => $attr_val) {
                         if (!empty($modelAttr->$attr_val['name'])) {
-                            $user->link('userAttributes', UserAttributes::findOne($id_attr));
-
-                            $userAttribValue=UserAttributeValues::findOne(Yii::$app->db->lastInsertID);
-                            $userAttribValue->value=$modelAttr->$attr_val['name'];
-                            $userAttribValue->save();
+                            $UserAttribVal = new UserAttributeValues();
+                            $UserAttribVal->attr_id = $id_attr;
+                            $UserAttribVal->user_id = $user->id;
+                            $UserAttribVal->value = $modelAttr->$attr_val['name'];
+                            if(!$UserAttribVal->save()){
+                                return false;
+                            }
                         }
                     }
+                    Yii::$app->user->login($user);
+                    return $this->goHome();
                 }
             }
         }
-
         return $this->render('signup', [
             'model' => $model,
             'modelAttr' => $modelAttr,
-            //'modelAttr' => $userAttr,
-            'attrs' => $attributes
+            'attrs' => $attrs
         ]);
     }
 

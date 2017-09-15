@@ -16,6 +16,7 @@ use Yii;
  */
 class AttributeValidate extends \yii\db\ActiveRecord
 {
+    const SCENARIO_TABULAR = 'tabular';
     /**
      * @inheritdoc
      */
@@ -31,12 +32,19 @@ class AttributeValidate extends \yii\db\ActiveRecord
     {
         return [
             [['attr_id'], 'required'],
+            [['value'], 'required', 'on' => self::SCENARIO_TABULAR],
             [['attr_id'], 'integer'],
             [['type', 'required'], 'string'],
             [['attr_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAttributes::className(), 'targetAttribute' => ['attr_id' => 'id']],
         ];
     }
 
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_TABULAR] = ['value'];
+        return $scenarios;
+    }
     /**
      * @inheritdoc
      */

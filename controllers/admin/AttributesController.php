@@ -67,28 +67,18 @@ class AttributesController extends Controller
     public function actionCreate()
     {
         $model = new UserAttributes();
-        //$values = $model->getAttributeValidate()->indexBy('attr_id')->all();
-        $validates = Validate::find()->indexBy('id')->all();
-        /*foreach (array_diff_key($attributes, $values) as $attribute) {
-            echo '<pre>';print_r($attribute);echo '</pre>';
-            $values[$attribute->id] = new AttributeValidate(['attr_id' => $attribute->id]);
-        }*/
+        //$values = $model->getAttributeValidate()->with('valid')->indexBy('attr_id')->all();
+        $values=$this->initValid($model);
 
-        //$values = AttributeValidate::find()->indexBy('id')->all();
+        $post=Yii::$app->request->post();
 
-
-        if (Model::loadMultiple($validates, Yii::$app->request->post())) {
-            //echo '<pre>';print_r($values);echo '</pre>';
-        }
-        //echo '<pre>';print_r($values);echo '</pre>';
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load($post) && $model->save() && Model::loadMultiple($values, $post)) {
+            $this->saveValid($values,$model);
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
+        }else {
             return $this->render('create', [
                 'model' => $model,
-                //'attrs' => $attributes,
-                'validates' => $validates,
+                'values' => $values,
             ]);
         }
     }
@@ -103,11 +93,17 @@ class AttributesController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $values=$this->initValid($model);
+
+        $post=Yii::$app->request->post();
+
+        if ($model->load($post) && $model->save() && Model::loadMultiple($values, $post)) {
+            $this->saveValid($values,$model);
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
+        }else {
             return $this->render('update', [
                 'model' => $model,
+                'values' => $values,
             ]);
         }
     }
@@ -140,4 +136,37 @@ class AttributesController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+
+    private function initValid(UserAttributes $model){
+
+        $values = $model->getAttributeValidate()->indexBy('valid_id')->all();
+
+        $validates = Validate::find()->indexBy('id')->all();
+
+        foreach (array_diff_key($validates, $values) as $valid) {
+            $values[$valid->id] = new AttributeValidate(['valid_id' => $valid->id]);
+        }
+        //echo '<pre>';print_r($values);echo '</pre>';
+
+        foreach ($values as $value) {
+            $value->setScenario(AttributeValidate::SCENARIO_TABULAR);
+        }
+        return $values;
+    }
+
+    private function saveValid($values, UserAttributes $model)
+    {
+        foreach ($values as $value) {
+            $value->attr_id = $model->id;
+            if ($value->validate()) {
+                if (!empty($value->value)) {
+                    $value->save(false);
+                } else {
+                    $value->delete();
+                }
+            }
+        }
+    }
+
 }

@@ -16,8 +16,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 
     <?php
-    foreach ($validates as $index => $value) {
-        echo $form->field($value, "[$index]name")->label($value->label);
+    foreach ($values as $index => $value){
+        echo $form->field($value, '[' . $index . ']value')->label($value->valid->label);
     }
     ?>
 
