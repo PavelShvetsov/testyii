@@ -73,8 +73,15 @@ class AttributesController extends Controller
         $post=Yii::$app->request->post();
 
         if ($model->load($post) && $model->save() && Model::loadMultiple($values, $post)) {
-            $this->saveValid($values,$model);
-            return $this->redirect(['view', 'id' => $model->id]);
+            //$this->saveValid($values,$model);
+            //return $this->redirect(['view', 'id' => $model->id]);
+
+            echo '<pre>';print_r($values);echo '</pre>';
+
+            return $this->render('create', [
+                'model' => $model,
+                'values' => $values,
+            ]);
         }else {
             return $this->render('create', [
                 'model' => $model,
@@ -140,14 +147,13 @@ class AttributesController extends Controller
 
     private function initValid(UserAttributes $model){
 
-        $values = $model->getAttributeValidate()->indexBy('valid_id')->all();
+        $values = $model->getAttributeValidate()->with('attributeProperties')->indexBy('valid_id')->all();
 
         $validates = Validate::find()->indexBy('id')->all();
 
         foreach (array_diff_key($validates, $values) as $valid) {
             $values[$valid->id] = new AttributeValidate(['valid_id' => $valid->id]);
         }
-        //echo '<pre>';print_r($values);echo '</pre>';
 
         foreach ($values as $value) {
             $value->setScenario(AttributeValidate::SCENARIO_TABULAR);

@@ -32,6 +32,8 @@ class UserAttributes extends \yii\db\ActiveRecord
             [['name', 'label'], 'required'],
             [['name'], 'string', 'max' => 255],
             [['label'], 'string', 'max' => 255],
+            [['type'], 'safe'],
+            //[['required'], 'safe'],
         ];
     }
 
@@ -43,8 +45,25 @@ class UserAttributes extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'label' => 'Label'
+            'label' => 'Label',
+            'type' => 'Тип поля',
+            //'required' => 'Обязательное',
         ];
+    }
+
+    private $_type;
+
+    public function getType()
+    {
+        if ($this->_type === null) {
+            $this->_type = ['срока','число'];
+        }
+        return $this->_type;
+    }
+
+    public function setType($value)
+    {
+        $this->_type = (array)$value;
     }
 
     /**

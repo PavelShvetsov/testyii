@@ -57,7 +57,13 @@ class AttributeValidate extends \yii\db\ActiveRecord
             'required' => 'Required',
         ];
     }
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAttrProp()
+    {
+        return $this->hasOne(AttributeProperties::className(), ['id' => 'attr_prop_id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -65,7 +71,9 @@ class AttributeValidate extends \yii\db\ActiveRecord
     {
         return $this->hasOne(UserAttributes::className(), ['id' => 'attr_id']);
     }
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getValid()
     {
         return $this->hasOne(Validate::className(), ['id' => 'valid_id']);

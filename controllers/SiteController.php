@@ -103,15 +103,32 @@ class SiteController extends Controller
         }
         //Динамическая модель
         $modelAttr = new DynamicModel($attrModel);
-
         //echo '<pre>';print_r($attrs);echo '</pre>';
 
         //Валидация доп.полей
         foreach($attrs as $attr) {
-            //$modelAttr->addRule([$attr['name']], $attr['attributeValidate'][0]->value, ['min' => 3]);
-            /*if($attr['attributeValidate'][0]->required){
-                $modelAttr->addRule([$attr['name']], 'required');
-            }*/
+            foreach($attr['attributeValidate'] as $valid){
+                switch($valid['valid']->name){
+                    case 'type':
+                        $type = $valid['value'];
+                    case 'required':
+                        $required = $valid['value'];
+                        break;
+                }
+            }
+            $required = ($required) ? 'required' : false;
+            switch ($type){
+                case 'I':
+                    $type = 'integer';
+                    break;
+                case 'S':
+                    $type = 'string';
+                    break;
+            }
+            $modelAttr->addRule([$attr['name']], $type);
+            if($required) {
+                $modelAttr->addRule([$attr['name']], $required);
+            }
         }
         return $modelAttr;
     }
@@ -124,9 +141,10 @@ class SiteController extends Controller
         }
 
         $model = new SignupForm();
-        $attrs=UserAttributes::find()->with('attributeValidate','attributeValidate2')->indexBy('id')->all();
 
-        echo '<pre>';print_r($attrs);echo '</pre>';
+        $attrs = UserAttributes::find()->with('attributeValidate.valid')->indexBy('id')->all();
+
+        //echo '<pre>';print_r($attrs);echo '</pre>';
 
         $modelAttr=$this->getModelFormAttributes($attrs);
 

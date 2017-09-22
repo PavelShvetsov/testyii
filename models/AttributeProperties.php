@@ -5,22 +5,22 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "validate".
+ * This is the model class for table "attribute_properties".
  *
  * @property integer $id
- * @property string $name
+ * @property string $code
  * @property string $label
  *
  * @property AttributeValidate[] $attributeValidates
  */
-class Validate extends \yii\db\ActiveRecord
+class AttributeProperties extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'validate';
+        return 'attribute_properties';
     }
 
     /**
@@ -29,7 +29,7 @@ class Validate extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'label'], 'string', 'max' => 255],
+            [['code', 'label'], 'string', 'max' => 255],
         ];
     }
 
@@ -40,7 +40,7 @@ class Validate extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'code' => 'Code',
             'label' => 'Label',
         ];
     }
@@ -50,6 +50,6 @@ class Validate extends \yii\db\ActiveRecord
      */
     public function getAttributeValidates()
     {
-        return $this->hasMany(AttributeValidate::className(), ['valid_id' => 'id']);
+        return $this->hasMany(AttributeValidate::className(), ['attr_prop_id' => 'id']);
     }
 }

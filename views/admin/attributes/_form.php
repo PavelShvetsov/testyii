@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\Validate;
+use app\models\AttributeProperties;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\UserAttributes */
@@ -15,9 +17,22 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 
+
+    <?php
+    //echo '<pre>';print_r($values);echo '</pre>';
+    ?>
     <?php
     foreach ($values as $index => $value){
-        echo $form->field($value, '[' . $index . ']value')->label($value->valid->label);
+        //$value->getAttrProp()->select(['code', 'label']);
+        //echo $form->field($value, '[' . $index . ']value')->label($value->valid->label);
+        $atr = AttributeProperties::find()->select(['id','label'])->where(['valid_id' => $index])->indexBy('id')->all();
+        $ar = [];
+        foreach ($atr as $item){
+            $ar[$item['id']]=$item['label'];
+        }
+
+        //echo '<pre>';print_r($a);echo '</pre>';
+        echo $form->field($value, '[' . $index . ']valid_id')->dropDownList($ar)->label($value->valid->label);
     }
     ?>
 
