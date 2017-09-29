@@ -62,7 +62,7 @@ class AttributeValidate extends \yii\db\ActiveRecord
      */
     public function getAttrProp()
     {
-        return $this->hasOne(AttributeProperties::className(), ['id' => 'attr_prop_id']);
+        return $this->hasOne(AttributeProperties::className(), ['id' => 'value']);
     }
     /**
      * @return \yii\db\ActiveQuery

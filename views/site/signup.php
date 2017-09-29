@@ -14,9 +14,9 @@ use yii\bootstrap\ActiveForm;
 <?= $form->field($model, 'password')->passwordInput() ?>
 <h3>Свойства пользователя</h3>
 <?php
-    foreach ($attrs as $attr){
+    /*foreach ($attrs as $attr){
         echo $form->field($modelAttr, $attr['name'])->textInput()->label($attr['label']);
-    }
+    }*/
 /*foreach ($modelAttr as $index => $setting) {
     echo $form->field($setting, "[$index]name")->label($setting->label);
 }*/

@@ -23,17 +23,22 @@ use app\models\AttributeProperties;
     ?>
     <?php
     foreach ($values as $index => $value){
-        //$value->getAttrProp()->select(['code', 'label']);
-        //echo $form->field($value, '[' . $index . ']value')->label($value->valid->label);
+
         $atr = AttributeProperties::find()->select(['id','label'])->where(['valid_id' => $index])->indexBy('id')->all();
+
+        //echo '<pre>';print_r($atr);echo '</pre>';
+
         $ar = [];
         foreach ($atr as $item){
             $ar[$item['id']]=$item['label'];
         }
 
-        //echo '<pre>';print_r($a);echo '</pre>';
-        echo $form->field($value, '[' . $index . ']valid_id')->dropDownList($ar)->label($value->valid->label);
+        echo $form->field($value, '[' . $index . ']value')->dropDownList($ar)->label($value->valid->label);
     }
+
+    /*foreach ($values as $index => $value){
+        echo $form->field($value, '[' . $index . ']value')->label($value->valid->label);
+    }*/
     ?>
 
     <div class="form-group">

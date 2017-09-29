@@ -67,21 +67,24 @@ class AttributesController extends Controller
     public function actionCreate()
     {
         $model = new UserAttributes();
-        //$values = $model->getAttributeValidate()->with('valid')->indexBy('attr_id')->all();
+
         $values=$this->initValid($model);
 
         $post=Yii::$app->request->post();
 
-        if ($model->load($post) && $model->save() && Model::loadMultiple($values, $post)) {
-            //$this->saveValid($values,$model);
-            //return $this->redirect(['view', 'id' => $model->id]);
+        //echo '<pre>';print_r($values);echo '</pre>';
 
+        if ($model->load($post) && $model->save() && Model::loadMultiple($values, $post)) {
+            $this->saveValid($values,$model);
+            return $this->redirect(['view', 'id' => $model->id]);
+
+            /*echo '<pre>';print_r($post);echo '</pre>';
             echo '<pre>';print_r($values);echo '</pre>';
 
             return $this->render('create', [
                 'model' => $model,
                 'values' => $values,
-            ]);
+            ]);*/
         }else {
             return $this->render('create', [
                 'model' => $model,
@@ -147,7 +150,7 @@ class AttributesController extends Controller
 
     private function initValid(UserAttributes $model){
 
-        $values = $model->getAttributeValidate()->with('attributeProperties')->indexBy('valid_id')->all();
+        $values = $model->getAttributeValidate()->with('attrProp')->indexBy('valid_id')->all();
 
         $validates = Validate::find()->indexBy('id')->all();
 
@@ -158,6 +161,7 @@ class AttributesController extends Controller
         foreach ($values as $value) {
             $value->setScenario(AttributeValidate::SCENARIO_TABULAR);
         }
+
         return $values;
     }
 

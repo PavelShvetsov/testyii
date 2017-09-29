@@ -110,9 +110,9 @@ class SiteController extends Controller
             foreach($attr['attributeValidate'] as $valid){
                 switch($valid['valid']->name){
                     case 'type':
-                        $type = $valid['value'];
+                        $type = $valid['attrProp'];
                     case 'required':
-                        $required = $valid['value'];
+                        $required = $valid['attrProp'];
                         break;
                 }
             }
@@ -142,11 +142,11 @@ class SiteController extends Controller
 
         $model = new SignupForm();
 
-        $attrs = UserAttributes::find()->with('attributeValidate.valid')->indexBy('id')->all();
+        $attrs = UserAttributes::find()->with('attributeValidate.valid','attributeValidate.attrProp')->indexBy('id')->all();
 
         //echo '<pre>';print_r($attrs);echo '</pre>';
 
-        $modelAttr=$this->getModelFormAttributes($attrs);
+        //$modelAttr=$this->getModelFormAttributes($attrs);
 
         //
         if($model->load(Yii::$app->request->post()) && $modelAttr->load(Yii::$app->request->post())){
@@ -178,7 +178,7 @@ class SiteController extends Controller
         }
         return $this->render('signup', [
             'model' => $model,
-            'modelAttr' => $modelAttr,
+            //'modelAttr' => $modelAttr,
             'attrs' => $attrs
         ]);
     }
