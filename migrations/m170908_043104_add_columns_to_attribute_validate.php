@@ -6,7 +6,7 @@ class m170908_043104_add_columns_to_attribute_validate extends Migration
 {
     public function safeUp()
     {
-        $this->dropColumn('attribute_validate', 'type');
+        /*$this->dropColumn('attribute_validate', 'type');
         $this->dropColumn('attribute_validate', 'required');
         $this->addColumn('attribute_validate', 'valid_id', $this->integer());
         $this->addColumn('attribute_validate', 'value', $this->integer());
@@ -27,7 +27,7 @@ class m170908_043104_add_columns_to_attribute_validate extends Migration
             'attribute_properties',
             'id',
             'CASCADE'
-        );
+        );*/
     }
 
     public function safeDown()

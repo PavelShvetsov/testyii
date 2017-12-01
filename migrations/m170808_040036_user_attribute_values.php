@@ -6,7 +6,7 @@ class m170808_040036_user_attribute_values extends Migration
 {
     public function safeUp()
     {
-        $this->createTable('user_attribute_values', [
+        /*$this->createTable('user_attribute_values', [
             'id' => $this->primaryKey(),
             'attr_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
@@ -31,7 +31,7 @@ class m170808_040036_user_attribute_values extends Migration
             'user',
             'id',
             'CASCADE'
-        );
+        );*/
     }
 
     public function safeDown()

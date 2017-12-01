@@ -12,9 +12,9 @@ class m170727_111712_create_test_table extends Migration
      */
     public function up()
     {
-        $this->createTable('test', [
+        /*$this->createTable('test', [
             'id' => $this->primaryKey(),
-        ]);
+        ]);*/
     }
 
     /**

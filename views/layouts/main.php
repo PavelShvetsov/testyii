@@ -39,6 +39,11 @@ AppAsset::register($this);
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
+            ['label' => 'Admin', 'items' => [
+                ['label' => 'Инфоблок', 'url' => ['/admin/iblock/index']],
+                ['label' => 'Тип инфоблока', 'url' => ['/admin/iblock-type/index']],
+                ['label' => 'Разделы', 'url' => ['/admin/iblock-section/index']],
+            ]],
             ['label' => 'Contact', 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
