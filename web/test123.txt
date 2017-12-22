@@ -1,0 +1,13 @@
+1Array
+(
+    [iblock_id] => 
+    [code] => 
+    [name] => 
+    [active] => 
+    [sort] => 
+    [picture] => 
+    [detail_picture] => 
+    [description] => 
+    [iblock_section_id] => 
+    [id] => 
+)

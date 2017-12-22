@@ -65,8 +65,14 @@ class IblockSectionController extends Controller
     {
         $model = new IblockSection();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $parentSectionNew = IblockSection::findOne($model->iblock_section_id);
+            IblockSection::updateSectionsAfterCreate($parentSectionNew);
+            $model->left_margin = $parentSectionNew->right_margin;
+            $model->right_margin = $parentSectionNew->right_margin + 1;
+            if($model->save()){
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -83,8 +89,14 @@ class IblockSectionController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $parent_section_id = $model->iblock_section_id;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            //update section margins
+            if($parent_section_id !== $model->iblock_section_id){
+                $parentSectionNew = IblockSection::findOne($model->iblock_section_id);
+                IblockSection::updateSectionsAfterMove($parentSectionNew,$model);
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
@@ -101,7 +113,9 @@ class IblockSectionController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        //$this->findModel($id)->delete();
+        $section = $this->findModel($id);
+        IblockSection::sectionsDelete($section);
 
         return $this->redirect(['index']);
     }
@@ -121,4 +135,5 @@ class IblockSectionController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

@@ -38,7 +38,7 @@ class m171130_051034_iblock_section extends Migration
         $this->createIndex(
             'idx-iblock_section-left_margin',
             '{{%iblock_section}}',
-            ['iblock_id', 'left_margin','right_margin'],
+            ['left_margin','right_margin'],
             true
         );
 
