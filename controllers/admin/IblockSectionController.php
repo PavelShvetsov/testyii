@@ -70,6 +70,7 @@ class IblockSectionController extends Controller
             IblockSection::updateSectionsAfterCreate($parentSectionNew);
             $model->left_margin = $parentSectionNew->right_margin;
             $model->right_margin = $parentSectionNew->right_margin + 1;
+            $model->depth_level = $parentSectionNew->depth_level + 1;
             if($model->save()){
                 return $this->redirect(['view', 'id' => $model->id]);
             }

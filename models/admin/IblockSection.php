@@ -98,8 +98,10 @@ class IblockSection extends \yii\db\ActiveRecord
 
     public static function updateSectionsAfterMove($parentSectionNew,$section)
     {
+        //смещение ключей раздела
         $skew_tree = $section->right_margin - $section->left_margin + 1;
-
+        //смещение уровня раздела
+        $skew_depth = $parentSectionNew->depth_level - $section->depth_level + 1;
         //Определяем направление переноса
         if($parentSectionNew->right_margin < $section->right_margin){
             $skew_position = 'left';
@@ -110,15 +112,17 @@ class IblockSection extends \yii\db\ActiveRecord
             case 'right':
                 $skew_section = $parentSectionNew->right_margin - 1 - $section->right_margin;
                 Yii::$app->db->createCommand("UPDATE {{%iblock_section}}
-                SET right_margin = IF(right_margin <= $section->right_margin,right_margin + {$skew_section},IF(right_margin < $parentSectionNew->right_margin,right_margin - {$skew_tree},right_margin)),
-                left_margin = IF(left_margin > $section->right_margin,left_margin - {$skew_tree},IF(left_margin >= $section->left_margin,left_margin + {$skew_section},left_margin))
+                SET depth_level = IF(right_margin <= {$section->right_margin},depth_level + $skew_depth,depth_level), 
+                right_margin = IF(right_margin <= $section->right_margin,right_margin + $skew_section,IF(right_margin < $parentSectionNew->right_margin,right_margin - $skew_tree,right_margin)),
+                left_margin = IF(left_margin > $section->right_margin,left_margin - $skew_tree,IF(left_margin >= $section->left_margin,left_margin + $skew_section,left_margin))
                 WHERE left_margin < $parentSectionNew->right_margin AND right_margin > $section->left_margin")
                     ->execute();
                 break;
             case 'left':
                 $skew_section = $section->left_margin - $parentSectionNew->right_margin;
                 Yii::$app->db->createCommand("UPDATE {{%iblock_section}}
-                SET left_margin = IF(left_margin >= $section->left_margin,left_margin - {$skew_section},IF(left_margin > $parentSectionNew->right_margin,left_margin + {$skew_tree},left_margin)),
+                SET depth_level = IF(left_margin >= $section->left_margin AND right_margin <= $section->right_margin,depth_level + $skew_depth,depth_level),
+                left_margin = IF(left_margin >= $section->left_margin,left_margin - {$skew_section},IF(left_margin > $parentSectionNew->right_margin,left_margin + {$skew_tree},left_margin)),
                 right_margin = IF(right_margin < $section->left_margin,right_margin + {$skew_tree},IF(right_margin <= $section->right_margin,right_margin - {$skew_section},right_margin))
                 WHERE right_margin >= $parentSectionNew->right_margin AND left_margin < $section->right_margin")
                     ->execute();
@@ -126,18 +130,20 @@ class IblockSection extends \yii\db\ActiveRecord
         }
     }
 
-    public static function updateSectionsAfterCreate($parentSectionNew){
+    public static function updateSectionsAfterCreate($parentSectionNew)
+    {
         Yii::$app->db->createCommand("UPDATE {{%iblock_section}} SET left_margin = IF(left_margin > $parentSectionNew->right_margin,left_margin + 2,left_margin),
         right_margin = right_margin + 2 WHERE right_margin>=$parentSectionNew->right_margin")
             ->execute();
     }
 
-    public static function sectionsDelete($section){
+    public static function sectionsDelete($section)
+    {
         $skew_tree = $section->right_margin - $section->left_margin + 1;
         Yii::$app->db->createCommand("DELETE FROM {{%iblock_section}} WHERE left_margin >= $section->left_margin AND right_margin <= $section->right_margin")
             ->execute();
         Yii::$app->db->createCommand("UPDATE {{%iblock_section}} SET left_margin = IF(left_margin > $section->right_margin,left_margin - {$skew_tree},left_margin),
-        right_margin = right_margin - {$skew_tree} WHERE right_margin>$section->right_margin")
+        right_margin = right_margin - {$skew_tree} WHERE right_margin > $section->right_margin")
             ->execute();
     }
 }
